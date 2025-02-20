@@ -1,0 +1,28 @@
+﻿@model AddProductCommand
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+}
+
+<h2>Add New Product</h2>
+
+<form asp-controller="Products" asp-action="Add" method="post">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">@nameof(Model.Name).Humanize()</label>
+        <input type="text" class="form-control" asp-for="Name" value="@Model.Name">
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Price" class="form-label">@nameof(Model.Price).Humanize()</label>
+        <input type="number" class="form-control" asp-for="Price" value="@Model.Price">
+        <span asp-validation-for="Price" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

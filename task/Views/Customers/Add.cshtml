@@ -1,0 +1,101 @@
+﻿@model AddCustomerCommand
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Layout";
+    var products = (List<SelectListItem>)ViewData[$"{nameof(AddCustomerCommand.Products)}"]!;
+}
+
+<h2>Add New Customer</h2>
+
+<form asp-controller="Customers" asp-action="Add" method="post" id="addCustomerForm">
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">@nameof(Model.Name).Humanize()</label>
+        <input type="text" class="form-control" asp-for="Name" value="@Model.Name">
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Code" class="form-label">@nameof(Model.Code).Humanize()</label>
+        <input type="text" class="form-control" asp-for="Code" value="@Model.Code">
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DateOfRegistration" class="form-label">@nameof(Model.DateOfRegistration).Humanize()</label>
+        <input type="date" class="form-control" asp-for="DateOfRegistration" value="@Model.DateOfRegistration.ToString("yyyy-MM-dd")">
+        <span asp-validation-for="DateOfRegistration" class="text-danger"></span>
+    </div>
+
+    <!-- Replace the nested form with a div -->
+    <div id="addProductForm">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label for="productId" class="form-label">Product</label>
+                <select name="productId" id="productId" asp-items="products" class="form-control">
+                    <option value="">-- Select a Product --</option>
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="productPrice" class="form-label">Price</label>
+                <input type="number" name="productPrice" id="productPrice" class="form-control" value="0">
+            </div>
+
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="button" id="submitProductForm" class="btn btn-secondary">Add Product</button>
+            </div>
+        </div>
+        <span asp-validation-for="Products" class="text-danger"></span>
+    </div>
+
+    <div id="productListContainer" class="mt-3">
+        <partial name="_ProductListPartial" model="Model.Products" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<script>
+    document.getElementById('submitProductForm').addEventListener('click', function (e) {
+        e.preventDefault(); // Prevent the default form submission
+
+        // Get the productId and productPrice values
+        var productId = document.getElementById('productId').value;
+        var productPrice = document.getElementById('productPrice').value;
+
+        // Create a FormData object
+        var formData = new FormData();
+        formData.append('productId', productId);
+        formData.append('productPrice', productPrice);
+
+        // Send the AJAX request to the AddProducts action
+        fetch('@Url.Action("AddProducts", "Customers")', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                return response.text();
+            } else {
+                throw new Error('There was an error adding the product.');
+            }
+        }).then(html => {
+            // Update the product list container with the new partial view
+            document.getElementById('productListContainer').innerHTML = html;
+
+            // Reset the form fields
+            document.getElementById('productId').value = '';
+            document.getElementById('productPrice').value = '0';
+        }).catch(error => {
+            console.error('Error:', error);
+            alert(error.message);
+        });
+    });
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,21 @@
+﻿@model List<CustomerProductsModel>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">@nameof(CustomerWithProductsQueryResult.ProductResult.ProductName).Humanize()</th>
+            <th scope="col">@nameof(CustomerWithProductsQueryResult.ProductResult.Price).Humanize()</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            <tr>
+                <th scope="row">@(Model.IndexOf(product) + 1)</th>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>
